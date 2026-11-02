@@ -1,0 +1,8 @@
+{
+  "name": "sdev257-hello-world",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "expo-status-bar": "~3.0.9"
+  }
+}
