@@ -28,8 +28,22 @@ Import this folder into Expo Snack using SDK 54. Select Web, Android, or iOS, or
 
 ## Submission
 
-Submit the public GitHub folder link and the saved Expo Snack link in Canvas.
+- GitHub: https://github.com/ashliewyse/sdev257-coursework/tree/main/module-03-todo-app
+- Expo Snack: https://snack.expo.dev/@justmeashlie/sdev257-todo-app-part-2---ashlie-wyse
+
+Submit both links in Canvas.
 
 ## Validation
 
-Validation results and the final Snack URL will be recorded after testing.
+- Eight component behavior checks pass: initial state, add/reset/dismiss, blank input, correct middle removal, duplicate labels, keyboard submission, long lists, and keyboard-avoidance configuration.
+- Expo Snack Web: adding, completing, duplicate labels, blank input, keyboard submission, and scrolling to the final task verified. Snack reports no errors.
+- iPhone 16 Pro simulator: app launch, task entry, input above the software keyboard, addition/input reset, and tap-to-complete verified.
+- Pixel 9 Pro Android emulator: app launch, task entry, input above the software keyboard, addition/input reset/keyboard dismissal, and tap-to-complete verified.
+
+Component tests run the actual React component and hooks with native UI primitives mocked; native behavior is checked separately in Snack. The test runner reports its own React test-renderer deprecation warning. No physical-device testing has been performed.
+
+## References
+
+- Assigned Canvas tutorial: Made With Matt, "Build your first React Native app - Todo List Tutorial Part 2".
+- React Native KeyboardAvoidingView: https://reactnative.dev/docs/keyboardavoidingview
+- React Native TextInput: https://reactnative.dev/docs/textinput
