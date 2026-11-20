@@ -6,6 +6,7 @@ import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import ResourceList from './components/ResourceList';
+import SearchDialog from './components/SearchDialog';
 import { colors } from './theme';
 
 const Tabs = createBottomTabNavigator();
@@ -31,6 +32,7 @@ function ScreenLayout({ name, resource }) {
         <View style={styles.rule} />
         <Text accessibilityRole="header" style={styles.title}>{name}</Text>
       </View>
+      <SearchDialog screenName={name} />
       <ResourceList key={resource} resource={resource} />
     </SafeAreaView>
   );
