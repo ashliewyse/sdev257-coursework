@@ -5,10 +5,11 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import ResourceList from './components/ResourceList';
+import { colors } from './theme';
 
 const Tabs = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-const colors = { background: '#0b101a', surface: '#151e2d', text: '#f5f7fa', accent: '#ffe070' };
 const theme = {
   ...DarkTheme,
   colors: {
@@ -21,27 +22,28 @@ const theme = {
   },
 };
 
-// Shared Flexbox layout; each screen displays its own name for this assignment.
-function ScreenLayout({ name }) {
+// The original three screens now share a list that fetches their own API data.
+function ScreenLayout({ name, resource }) {
   return (
     <SafeAreaView style={styles.screen} edges={['left', 'right', 'bottom']}>
-      <View style={styles.content}>
+      <View style={styles.heading}>
         <Text style={styles.series}>STAR WARS</Text>
         <View style={styles.rule} />
         <Text accessibilityRole="header" style={styles.title}>{name}</Text>
       </View>
+      <ResourceList key={resource} resource={resource} />
     </SafeAreaView>
   );
 }
 
 function PlanetsScreen() {
-  return <ScreenLayout name="Planets" />;
+  return <ScreenLayout name="Planets" resource="planets" />;
 }
 function FilmsScreen() {
-  return <ScreenLayout name="Films" />;
+  return <ScreenLayout name="Films" resource="films" />;
 }
 function SpaceshipsScreen() {
-  return <ScreenLayout name="Spaceships" />;
+  return <ScreenLayout name="Spaceships" resource="starships" />;
 }
 
 const screens = [
@@ -101,9 +103,9 @@ export default function App() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   screen: { flex: 1, backgroundColor: colors.background },
-  content: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  series: { color: colors.accent, fontSize: 18, fontWeight: '700', letterSpacing: 4 },
-  rule: { width: 40, height: 3, backgroundColor: colors.accent, marginVertical: 22 },
-  title: { color: colors.text, fontSize: 32, fontWeight: '700', textAlign: 'center' },
+  heading: { alignItems: 'flex-start', paddingHorizontal: 24, paddingTop: 20 },
+  series: { color: colors.accent, fontSize: 12, fontWeight: '700', letterSpacing: 4 },
+  rule: { width: 40, height: 2, backgroundColor: colors.accent, marginVertical: 12 },
+  title: { color: colors.text, fontSize: 30, fontWeight: '700' },
   tabSymbol: { fontSize: 17, fontWeight: '700' },
 });
