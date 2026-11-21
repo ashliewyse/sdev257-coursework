@@ -1,4 +1,4 @@
-# Star Wars App - Module 05 Animation
+# Star Wars App - Module 05 Image
 
 Ashlie Wyse - SDEV257
 
@@ -8,6 +8,21 @@ This updates the existing Star Wars app with scrollable lists and swipe-to-modal
 
 - Expo Snack: https://snack.expo.dev/@justmeashlie/sdev257-star-wars---ashlie-wyse
 - GitHub: https://github.com/ashliewyse/sdev257-coursework/tree/main/module-02-star-wars
+
+## Module 05 Assignment 3: Lazy-loaded image
+
+Every screen now has a space photograph behind its heading. The same star field and spiral galaxy image provides a consistent Star Wars/outer-space theme. Text has a dark overlay and shadow for contrast, and the header uses a minimum height so larger text can expand it.
+
+`components/LazyHeaderImage.js` does not render an Image or provide a network URI until both conditions are true: the screen is focused (`useIsFocused` in App.js), and its header reports a positive width and height in `onLayout`. Both navigators explicitly use `lazy: true`; unopened screens are not mounted in advance. No image prefetch is used. This is actual deferred image loading, in addition to the network request being asynchronous.
+
+Once loading starts, a spinner appears while the title remains readable. Successful images stay mounted when revisiting a screen, allowing the platform's normal caching. An error replaces the spinner with an accessible Retry image button; stale callbacks from an earlier attempt cannot finish or fail a newer retry. Loading the image does not block the list, search input, swipe actions, or animated item dialog.
+
+The remote image is an 800-pixel-wide JPEG (147,149 bytes when verified), served by NASA Science's image service. The app requires that external host to be available; a network error offers Retry rather than substituting unrelated data. No new package dependencies were added.
+
+Image: Digitized Sky Survey Image of Star Field Around M83.
+Credit: Digitized Sky Survey (DSS), STScI/AURA, Palomar/Caltech, and UKSTU/AAO.
+Source and credit: https://science.nasa.gov/asset/hubble/digitized-sky-survey-image-of-star-field-around-m83/
+Image URL: https://assets.science.nasa.gov/dynamicimage/assets/science/missions/hubble/releases/2009/11/STScI-01EVT5CN2R8S6WGXG1QJD9XN62.tif?w=800
 
 ## Module 05 Assignment 2: Animation
 
@@ -47,7 +62,8 @@ ResourceList uses useEffect, fetch, and useState. It reads results for planets/s
 
 ## Files
 
-- App.js: platform navigation and shared screen layout.
+- App.js: lazy platform navigation, focused-screen detection, and shared image header/layout.
+- components/LazyHeaderImage.js: deferred image mounting, load status, and retry.
 - components/ResourceList.js: fetching, pagination, bounded ScrollView, and selected item.
 - components/SwipeableResourceRow.js: Swipeable, both swipe directions, row reset, and accessible tap alternative.
 - components/ItemDialog.js: animated item-text modal, motion preference handling, scrollable content, and Close.
@@ -63,11 +79,15 @@ This assignment uses the Swipeable export from the existing Gesture Handler 2.28
 
 To run automated checks locally, open the verification folder, run npm ci, then npm test.
 
-All 30 tests pass: ten API/pagination tests, nine existing search tests, seven swipe-selection/modal tests, and four animation lifecycle/accessibility tests. These cover each resource type, film metadata, appended-row selection, Close/native Back callbacks, repeated selection, long Unicode text, and the accessible tap alternative. The renderer emits a deprecation notice. Tests use controlled network responses and native rendering adapters; they do not simulate the native gesture engine.
+All 34 tests pass: ten API/pagination tests, nine existing search tests, seven swipe-selection/modal tests, four animation lifecycle/accessibility tests, and four lazy-image loading/retry tests. These cover each resource type, film metadata, appended-row selection, Close/native Back callbacks, repeated selection, long Unicode text, and the accessible tap alternative. The renderer emits a deprecation notice. Tests use controlled network responses and native rendering adapters; they do not simulate the native gesture engine.
 
 Physical-device testing has not been performed. See the included verification record for the live preview checks.
 
 ## References
+
+- Module 05 Image assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945668
+- React Native Image: https://reactnative.dev/docs/0.81/image
+- React Navigation useIsFocused: https://reactnavigation.org/docs/use-is-focused/
 
 - Module 05 Animation assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945662
 - React Native Animated: https://reactnative.dev/docs/0.81/animated

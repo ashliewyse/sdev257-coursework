@@ -1,5 +1,5 @@
 const React = require('react');
-for (const name of ['View','Text','TouchableOpacity','ActivityIndicator','TextInput','Pressable','Modal','ScrollView']) exports[name] = name;
+for (const name of ['View','Text','TouchableOpacity','ActivityIndicator','TextInput','Pressable','Modal','ScrollView','Image']) exports[name] = name;
 exports.Keyboard = { dismiss() {} };
 exports.StyleSheet = { create: styles => styles };
 exports.Platform = { OS: 'ios' };

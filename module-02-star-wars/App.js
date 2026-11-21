@@ -2,11 +2,12 @@ import 'react-native-gesture-handler';
 import { Platform, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { DarkTheme, NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, NavigationContainer, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import ResourceList from './components/ResourceList';
 import SearchDialog from './components/SearchDialog';
+import LazyHeaderImage from './components/LazyHeaderImage';
 import { colors } from './theme';
 
 const Tabs = createBottomTabNavigator();
@@ -25,12 +26,17 @@ const theme = {
 
 // The original three screens now share a list that fetches their own API data.
 function ScreenLayout({ name, resource }) {
+  const isFocused = useIsFocused();
   return (
     <SafeAreaView style={styles.screen} edges={['left', 'right', 'bottom']}>
       <View style={styles.heading}>
-        <Text style={styles.series}>STAR WARS</Text>
-        <View style={styles.rule} />
-        <Text accessibilityRole="header" style={styles.title}>{name}</Text>
+        <LazyHeaderImage active={isFocused} />
+        <View pointerEvents="none" style={styles.headingShade} />
+        <View pointerEvents="none" style={styles.headingContent}>
+          <Text style={styles.series}>STAR WARS</Text>
+          <View style={styles.rule} />
+          <Text accessibilityRole="header" style={styles.title}>{name}</Text>
+        </View>
       </View>
       <SearchDialog screenName={name} />
       <ResourceList key={resource} resource={resource} />
@@ -57,6 +63,7 @@ const screens = [
 function BottomTabs() {
   return (
     <Tabs.Navigator screenOptions={{
+      lazy: true,
       headerTintColor: colors.text,
       tabBarActiveTintColor: colors.accent,
       tabBarInactiveTintColor: '#b3bfd1',
@@ -75,6 +82,7 @@ function BottomTabs() {
 function AndroidDrawer() {
   return (
     <Drawer.Navigator screenOptions={{
+      lazy: true,
       headerTintColor: colors.text,
       drawerActiveTintColor: colors.accent,
       drawerInactiveTintColor: colors.text,
@@ -105,9 +113,13 @@ export default function App() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   screen: { flex: 1, backgroundColor: colors.background },
-  heading: { alignItems: 'flex-start', paddingHorizontal: 24, paddingTop: 20 },
+  heading: { minHeight: 128, marginHorizontal: 24, marginTop: 12,
+    borderRadius: 12, overflow: 'hidden' },
+  headingShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.25)' },
+  headingContent: { padding: 16, alignItems: 'flex-start' },
   series: { color: colors.accent, fontSize: 12, fontWeight: '700', letterSpacing: 4 },
-  rule: { width: 40, height: 2, backgroundColor: colors.accent, marginVertical: 12 },
-  title: { color: colors.text, fontSize: 30, fontWeight: '700' },
+  rule: { width: 40, height: 2, backgroundColor: colors.accent, marginVertical: 8 },
+  title: { color: colors.text, fontSize: 28, fontWeight: '700',
+    textShadowColor: '#000', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
   tabSymbol: { fontSize: 17, fontWeight: '700' },
 });

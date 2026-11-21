@@ -1,27 +1,35 @@
-# Module 05 Animation verification
+# Module 05 Image verification
 
-Verified November 21, 2026 on the final SDK 54 Snack source. Assignment 2 adds an explicit fade-and-zoom entrance to the existing item-details card.
+Verified November 21, 2026 using the final SDK 54 Snack source. Assignment 3 adds a themed, lazy-loaded header image to Planets, Films, and Spaceships, preserving the previous scroll, search, swipe, and animated item-dialog features.
 
 ## Automated checks
 
-`npm test` in verification: 30 passed, 0 failed. This includes the previous 26 API/pagination/search/swipe tests and 4 new animation lifecycle/accessibility tests.
+`npm test` in verification: **34 passed, 0 failed**. This includes the previous 30 API/pagination/search/swipe/animation tests and four new image lifecycle tests.
 
-The new tests cover cancellation during an entrance, reopening a new item, preparing opacity before native presentation (first and repeated opens), Reduce Motion immediate visibility, a delayed initial preference query losing to a newer event, and stopping/revealing the card when Reduce Motion becomes enabled. Native rendering and animation boundaries are adapted in Node; these tests do not verify native frame timing. React Test Renderer emits its upstream deprecation notice.
+The four new tests first failed against the baseline, then passed with the implementation. They verify:
 
-The four new tests failed against the baseline. A separate review identified a possible flash before onShow; a new assertion reproduced it, the value was reset while hidden, and the complete 30-test suite then passed.
+- An unfocused screen does not mount an Image, even after layout; focusing starts it.
+- A focused screen waits for a positive-width, positive-height layout before mounting the remote image.
+- Successful loading removes the busy indicator; blur/refocus preserves the mounted image and loaded status.
+- Failure removes the busy state and exposes Retry. Retry mounts a new image attempt, and stale callbacks cannot finish that new attempt.
+
+These tests control the native Image event boundary in Node. They do not capture real network requests, decode images, or prove native cache behavior. React Test Renderer emits its upstream deprecation notice.
+
+An independent review found that a fixed-height header could clip enlarged text. It was changed to a minimum height so the content can grow. The complete 34-test suite passed after this final change.
 
 ## Live preview checks
 
-- Web/Chrome: all three screens opened the correct item content. Read-only DOM observations captured the actual Animated styles during entrance: Tatooine opacity 0.479958 / scale 0.958397, then opacity 1 / scale 1. Reopening it captured opacity 0.358381 / scale 0.94867. Films (A New Hope) and Spaceships (CR90 corvette) also showed intermediate opacity/scale values and correct text. Close and Escape worked.
-- iPhone 16 Pro simulator/Expo Go: the Tatooine card was observed partly faded and then fully visible. Close returned to the list; swiping Alderaan opened a fresh, fully visible dialog with the correct name.
-- Pixel 9 Pro emulator/Expo Go: tapping Tatooine displayed its dialog, Android Back returned to the list, and swiping Alderaan reopened the correct dialog. Native preview showed the entrance progressing to a fully visible card.
-- Snack reported no errors. ItemDialog.js was copied back through the editor and matched the local source. Explicit Save finished with Saved / All changes saved.
+- Web/Chrome: Planets, Films, and Spaceships each displayed the space banner with readable titles. Read-only DOM checks found the image complete with naturalWidth 800 on each screen. Spaceships scrolled to Rebel transport; swiping opened the matching item dialog.
+- iPhone 16 Pro simulator/Expo Go: all three screens displayed the banner, heading, search, and list. With the preview's XXXL font-scaling setting selected, Planets and Spaceships headings remained fully visible. The font setting was restored afterward.
+- Pixel 9 Pro emulator/Expo Go: Planets, Films, and Spaceships displayed the image; drawer navigation continued to work.
+- Snack reported no errors. LazyHeaderImage.js was copied back through the editor and matched the local source. Explicit Save completed with Saved / All changes saved.
+- The NASA-hosted image endpoint returned HTTP 200, image/jpeg, 147149 bytes at the selected 800-pixel width. Image credit and source links are in README.md.
 
-Physical-device testing and a live OS Reduce Motion toggle were not performed. Reduce Motion branches were tested through the controlled native API boundary. Internet and SWAPI availability remain external dependencies.
+Physical-device testing and live offline/error injection were not performed. Retry and stale-event behavior were checked with controlled events. The image host, internet connection, and SWAPI remain external dependencies. Image caching depends on the platform and host; the app does not prefetch banners.
 
-## Prior Assignment 1 behavior
+## Retained prior coverage
 
-The preceding Scroll assignment tested vertical scrolling and left/right swipe selection on Planets, Films, and Spaceships in Web, iPhone, and Android, including Android pagination/new-row swiping, movie metadata, Close and Back. Its source, list components, search components, dependency versions, and navigation are unchanged in this assignment; its automated coverage remains in the 30-test suite.
+The automated suite retains the preceding assignments' API/pagination/search/swipe and animated-dialog coverage. Assignment 2 additionally checked actual web fade/scale values and native dialog opening; Assignment 1 checked scrolling and left/right swipes on all three platforms. Those earlier live checks were not all repeated for this image-only change. A live OS Reduce Motion toggle remains untested; its branches have controlled automated coverage.
 
 ## Run locally
 
