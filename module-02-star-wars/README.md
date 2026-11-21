@@ -1,4 +1,4 @@
-# Star Wars App - Module 05 Scroll and Swipe
+# Star Wars App - Module 05 Animation
 
 Ashlie Wyse - SDEV257
 
@@ -8,6 +8,16 @@ This updates the existing Star Wars app with scrollable lists and swipe-to-modal
 
 - Expo Snack: https://snack.expo.dev/@justmeashlie/sdev257-star-wars---ashlie-wyse
 - GitHub: https://github.com/ashliewyse/sdev257-coursework/tree/main/module-02-star-wars
+
+## Module 05 Assignment 2: Animation
+
+Opening an item-details dialog on Planets, Films, or Spaceships fades the card from transparent to opaque while gently scaling it from 92% to 100% over 240 ms. It works after either a row swipe or an accessible tap. This draws attention to the chosen item without moving the list or delaying Close/Back.
+
+`components/ItemDialog.js` uses core React Native `Animated.Value`, `Animated.timing`, `Animated.View`, and ease-out cubic easing. The native driver handles iOS/Android opacity and transform updates; Web uses the JavaScript driver. The starting value is prepared while hidden and timing starts in `Modal.onShow` so the animation is visible after presentation. Closing cancels an unfinished entrance; reopening replays it.
+
+`AccessibilityInfo` honors Reduce Motion. Unknown settings initially use a still presentation, a live enabled preference immediately reveals the whole card, and stale initial query results cannot override a newer setting event. No new dependencies were installed. The existing Modal fade is replaced by this explicit Animated entrance; the backdrop stays still.
+
+To see the animation, open any screen and swipe or tap a row. Close it and open another row to replay.
 
 ## Module 05 Assignment 1
 
@@ -40,7 +50,7 @@ ResourceList uses useEffect, fetch, and useState. It reads results for planets/s
 - App.js: platform navigation and shared screen layout.
 - components/ResourceList.js: fetching, pagination, bounded ScrollView, and selected item.
 - components/SwipeableResourceRow.js: Swipeable, both swipe directions, row reset, and accessible tap alternative.
-- components/ItemDialog.js: item-text modal with scrollable content and Close.
+- components/ItemDialog.js: animated item-text modal, motion preference handling, scrollable content, and Close.
 - components/SearchDialog.js: the existing Module 04 search preview.
 - theme.js: the shared navy and yellow palette.
 - verification/: regression tests and their independent package manifest.
@@ -53,11 +63,15 @@ This assignment uses the Swipeable export from the existing Gesture Handler 2.28
 
 To run automated checks locally, open the verification folder, run npm ci, then npm test.
 
-All 26 tests pass: ten API/pagination tests, nine existing search tests, and seven swipe-selection/modal tests. These cover each resource type, film metadata, appended-row selection, Close/native Back callbacks, repeated selection, long Unicode text, and the accessible tap alternative. The renderer emits a deprecation notice. Tests use controlled network responses and native rendering adapters; they do not simulate the native gesture engine.
+All 30 tests pass: ten API/pagination tests, nine existing search tests, seven swipe-selection/modal tests, and four animation lifecycle/accessibility tests. These cover each resource type, film metadata, appended-row selection, Close/native Back callbacks, repeated selection, long Unicode text, and the accessible tap alternative. The renderer emits a deprecation notice. Tests use controlled network responses and native rendering adapters; they do not simulate the native gesture engine.
 
 Physical-device testing has not been performed. See the included verification record for the live preview checks.
 
 ## References
+
+- Module 05 Animation assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945662
+- React Native Animated: https://reactnative.dev/docs/0.81/animated
+- React Native AccessibilityInfo: https://reactnative.dev/docs/0.81/accessibilityinfo
 
 - Module 05 assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945657
 - Course text: Chapters 23 and 24 (modals, scrolling, and swipeable controls).

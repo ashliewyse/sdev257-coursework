@@ -1,31 +1,28 @@
-# Module 05 verification
+# Module 05 Animation verification
 
-Verified November 21, 2026 using the final SDK 54 Snack implementation.
+Verified November 21, 2026 on the final SDK 54 Snack source. Assignment 2 adds an explicit fade-and-zoom entrance to the existing item-details card.
 
 ## Automated checks
 
-`npm test` in this folder: 26 passed, 0 failed.
+`npm test` in verification: 30 passed, 0 failed. This includes the previous 26 API/pagination/search/swipe tests and 4 new animation lifecycle/accessibility tests.
 
-- 10 API/list/pagination regression tests.
-- 9 existing search-input and search-modal tests.
-- 7 swipe-selection/item-modal tests covering all three resource types, film metadata, appended rows, repeated selection, close/back callbacks, long Unicode text, and accessible tapping.
+The new tests cover cancellation during an entrance, reopening a new item, preparing opacity before native presentation (first and repeated opens), Reduce Motion immediate visibility, a delayed initial preference query losing to a newer event, and stopping/revealing the card when Reduce Motion becomes enabled. Native rendering and animation boundaries are adapted in Node; these tests do not verify native frame timing. React Test Renderer emits its upstream deprecation notice.
 
-Tests use controlled fetch responses and native rendering adapters. They exercise state and callback behavior, not the native gesture engine. React Test Renderer reports its upstream deprecation notice.
+The four new tests failed against the baseline. A separate review identified a possible flash before onShow; a new assertion reproduced it, the value was reset while hidden, and the complete 30-test suite then passed.
 
 ## Live preview checks
 
-| Environment | Observed results |
-| --- | --- |
-| Web in Chrome | Swiping Tatooine left opened its item dialog; Escape dismissed it. Films scrolled to Revenge of the Sith; swiping right showed the title, episode 3, 2005-05-19, and George Lucas. Spaceships scrolled to Rebel transport; swiping left opened the correct dialog. Close returned to the list. |
-| iPhone 16 Pro simulator in Expo Go | All three tabs loaded live data and scrolled vertically. Tatooine opened from both left and right swipes, including reopening the same row after Close. Scrolled film and spaceship rows opened the correct Revenge of the Sith and Rebel transport dialogs. Film metadata was visible. Close preserved the list position. |
-| Pixel 9 Pro emulator in Expo Go | Drawer navigation opened all three screens with live data. All three lists scrolled vertically. Tatooine, Revenge of the Sith, and Rebel transport opened the correct dialogs from horizontal swipes. Android Back and Close dismissed dialogs. Load more appended planets, and the newly loaded Geonosis row opened correctly from a right swipe. |
+- Web/Chrome: all three screens opened the correct item content. Read-only DOM observations captured the actual Animated styles during entrance: Tatooine opacity 0.479958 / scale 0.958397, then opacity 1 / scale 1. Reopening it captured opacity 0.358381 / scale 0.94867. Films (A New Hope) and Spaceships (CR90 corvette) also showed intermediate opacity/scale values and correct text. Close and Escape worked.
+- iPhone 16 Pro simulator/Expo Go: the Tatooine card was observed partly faded and then fully visible. Close returned to the list; swiping Alderaan opened a fresh, fully visible dialog with the correct name.
+- Pixel 9 Pro emulator/Expo Go: tapping Tatooine displayed its dialog, Android Back returned to the list, and swiping Alderaan reopened the correct dialog. Native preview showed the entrance progressing to a fully visible card.
+- Snack reported no errors. ItemDialog.js was copied back through the editor and matched the local source. Explicit Save finished with Saved / All changes saved.
 
-No app error was displayed in these final previews. Physical-device testing was not performed. SWAPI and internet availability remain external dependencies.
+Physical-device testing and a live OS Reduce Motion toggle were not performed. Reduce Motion branches were tested through the controlled native API boundary. Internet and SWAPI availability remain external dependencies.
 
-## Compatibility decision
+## Prior Assignment 1 behavior
 
-The app uses the root `Swipeable` export from the existing Gesture Handler 2.28 dependency. Importing ReanimatedSwipeable as a separate Snack dependency caused duplicate native-view registration in Expo Go. Removing that subpath dependency and using the root export fixed the native launch; the tests and live checks above were performed after that change. The root Swipeable API is deprecated, so a future SDK or tooling migration should reassess it.
+The preceding Scroll assignment tested vertical scrolling and left/right swipe selection on Planets, Films, and Spaceships in Web, iPhone, and Android, including Android pagination/new-row swiping, movie metadata, Close and Back. Its source, list components, search components, dependency versions, and navigation are unchanged in this assignment; its automated coverage remains in the 30-test suite.
 
 ## Run locally
 
-From this verification directory, run `npm ci`, then `npm test`. Tests build the neighboring application components automatically. Generated `compiled-*.cjs` files and node_modules are intentionally excluded from the submission archive and GitHub source.
+Open this verification directory, run `npm ci`, then `npm test`. The tests build the neighboring source components. Generated compiled-*.cjs files and node_modules are excluded from the deliverable.
