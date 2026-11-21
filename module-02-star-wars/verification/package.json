@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": { "test": "node --test *.test.cjs" },
+  "dependencies": {
+    "esbuild": "0.25.12",
+    "react": "19.1.0",
+    "react-test-renderer": "19.1.0"
+  }
+}

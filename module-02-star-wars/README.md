@@ -1,69 +1,67 @@
-# Star Wars App - Module 04 Search Preview
+# Star Wars App - Module 05 Scroll and Swipe
 
 Ashlie Wyse - SDEV257
 
-This extends the existing Module 02 Star Wars app, including its Module 03 live SWAPI lists. The same Planets, Films, and Spaceships screens now each include a search input and submitted-text modal. The existing app is updated in place.
+This updates the existing Star Wars app with scrollable lists and swipe-to-modal interactions on Planets, Films, and Spaceships. It preserves API fetching, pagination, search preview, and platform navigation.
 
-## Open the project
+## Open the app
 
 - Expo Snack: https://snack.expo.dev/@justmeashlie/sdev257-star-wars---ashlie-wyse
 - GitHub: https://github.com/ashliewyse/sdev257-coursework/tree/main/module-02-star-wars
 
-## Search preview (Module 04 Assignment 2)
+## Module 05 Assignment 1
 
-1. Open Planets, Films, or Spaceships.
-2. Enter a term in the search input above the list.
-3. Tap **Search** or the keyboard's Search/Enter key. A modal displays exactly what was submitted.
-4. Tap **Close** to return and edit the term. Android Back and Web Escape also dismiss the modal.
+1. Open Planets, Films, or Spaceships. Each screen fetches live SWAPI data.
+2. Scroll vertically to see items below the screen.
+3. Swipe a row left or right. Completing the swipe opens a native modal displaying that item's text. Films also show their episode, release date, and director.
+4. Close the modal to return to the same list position. The row resets so it can be swiped again. Android Back and Web Escape also dismiss the dialog.
+5. Use **Load more** on Planets or Spaceships to append the next page; those rows can also be swiped.
 
-Blank or whitespace-only terms do not open a modal. Each screen keeps its own input. Long text wraps in a scrollable area while Close stays accessible. Keyboard submission uses the final native event text so a last edit cannot be lost to a state-update timing race.
+Each row is also a labeled button, providing a tap, keyboard, or screen-reader alternative. Long modal content scrolls separately from Close.
 
-This assignment only previews the entered text: it does not filter the list or issue a search request. Actual searching is deferred to the later assignment, as instructed.
+## Earlier features
+
+Each screen's search input still displays the submitted term in its own modal. Button and keyboard submission work, blank terms are blocked, and each screen keeps its own query. As specified in Module 04, this preview does not filter the list or make a search request.
+
+Android uses a drawer opened from the hamburger button. iOS and Web use bottom tabs.
 
 ## Live data
 
-| Screen | Endpoint | Displayed data |
+| Screen | Endpoint | Text displayed |
 | --- | --- | --- |
 | Planets | https://www.swapi.tech/api/planets | Planet names |
-| Films | https://www.swapi.tech/api/films | Titles, episode numbers, release dates, and directors |
+| Films | https://www.swapi.tech/api/films | Titles, episode numbers, release dates, directors |
 | Spaceships | https://www.swapi.tech/api/starships | Starship names |
 
-`ResourceList` uses `useEffect`, `fetch`, and `useState` to retrieve API data and a `FlatList` to render it. Planets and starships use the API's `results` array; films use `result` and each entry's `properties`. No sample records are shipped as application data.
+ResourceList uses useEffect, fetch, and useState. It reads results for planets/starships and result/properties for films. Load more follows the API's next URL and deduplicates stable IDs. Loading, empty, and error states are preserved; Retry repeats the failed request without discarding earlier pages. Requests are cancelled on unmount and time out after 20 seconds. Internet access and SWAPI availability are required. No sample records are shipped as application data.
 
-Planets and starships load one page at a time. **Load more** follows the API's `next` URL and appends records while preventing duplicate IDs. The screen shows loading progress, the loaded count, an empty state, and a Retry button after a failure. A failed later page preserves existing rows and retries that same page. Requests are cancelled on unmount and time out after 20 seconds.
+## Files
 
-## Navigation and files
+- App.js: platform navigation and shared screen layout.
+- components/ResourceList.js: fetching, pagination, bounded ScrollView, and selected item.
+- components/SwipeableResourceRow.js: Swipeable, both swipe directions, row reset, and accessible tap alternative.
+- components/ItemDialog.js: item-text modal with scrollable content and Close.
+- components/SearchDialog.js: the existing Module 04 search preview.
+- theme.js: the shared navy and yellow palette.
+- verification/: regression tests and their independent package manifest.
 
-- Android: open the hamburger menu to select a screen.
-- iOS and Web: use the bottom tabs.
-- `App.js`: the existing navigators and shared screen layout.
-- `components/SearchDialog.js`: controlled input, button/keyboard submission, and the native modal shared by all three screens.
-- `components/ResourceList.js`: fetching, pagination, status messages, and list rows.
-- `theme.js`: the original navy and yellow palette shared by the app and lists.
-- `package.json`: the existing Snack dependencies, unchanged.
+## Run and test
 
-## Run
+Open the saved Snack with SDK 54 and select Web, iOS, or Android. Expo supplies React and React Native. The root package.json is a Snack dependency manifest, not a standalone Expo CLI project.
 
-Open the saved Snack with SDK 54 and choose Web, iOS, or Android. Snack supplies Expo, React, and React Native; this dependency file is for Snack, not a standalone Expo CLI project. Internet access and SWAPI availability are required.
+This assignment uses the Swipeable export from the existing Gesture Handler 2.28 package. Its API is deprecated in favor of ReanimatedSwipeable in newer projects, but the root export is used here for SDK 54 Snack compatibility: importing the newer component as a separate Snack dependency caused duplicate native-view registration in Expo Go. No dependency versions were upgraded.
 
-## Validation
+To run automated checks locally, open the verification folder, run npm ci, then npm test.
 
-- Nineteen automated tests pass: the original ten live-list behavior tests plus nine search tests covering controlled input, exact text, button and keyboard submission, blank input, reopening, native Back, long Unicode/plain text, independent screen state, and the final-keyboard-value regression.
-- Web: all three screens displayed search inputs and live lists; each submitted term appeared in its modal. Blank input stayed disabled, long text scrolled with Close visible, and Escape dismissed the modal. Snack reported no errors.
-- iPhone 16 Pro simulator: all three tabs displayed their search input and live list. Submitted Luke (Planets), Hope (Films), and X-wing (Spaceships); each appeared correctly in its modal. Button and keyboard submission and Close worked.
-- Pixel 9 Pro emulator: the drawer opened all three screens with search inputs and live lists. Submitted Naboo, Jedi, and Falcon on the corresponding screens; each appeared correctly. Android Back dismissed the dialog, and Close and keyboard/button submission worked.
-- Automated tests use mocked network responses and native rendering primitives; live browser and simulator checks validate real network data. Physical-device testing was not performed.
+All 26 tests pass: ten API/pagination tests, nine existing search tests, and seven swipe-selection/modal tests. These cover each resource type, film metadata, appended-row selection, Close/native Back callbacks, repeated selection, long Unicode text, and the accessible tap alternative. The renderer emits a deprecation notice. Tests use controlled network responses and native rendering adapters; they do not simulate the native gesture engine.
+
+Physical-device testing has not been performed. See the included verification record for the live preview checks.
 
 ## References
 
-- Module 03 assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945639
-- Module 04 assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945651
+- Module 05 assignment: https://ivylearn.ivytech.edu/courses/1412233/assignments/24945657
+- Course text: Chapters 23 and 24 (modals, scrolling, and swipeable controls).
+- React Native ScrollView: https://reactnative.dev/docs/0.81/scrollview
+- React Native Modal: https://reactnative.dev/docs/0.81/modal
+- Gesture Handler 2.28 source: https://github.com/software-mansion/react-native-gesture-handler/blob/2.28.0/packages/react-native-gesture-handler/src/components/Swipeable.tsx
 - SWAPI documentation: https://swapi.tech/documentation
-- Course text, Chapter 19: Fetching list data.
-- Course text, Chapters 22 and 23: input and modal concepts.
-- React Native 0.81 TextInput: https://reactnative.dev/docs/0.81/textinput
-- React Native 0.81 Modal: https://reactnative.dev/docs/0.81/modal
-
-The existing GitHub folder and saved Snack are updated in place, preserving the Module 02 project's history.
-
-The downloadable assignment ZIP also includes `star-wars-verification`. From that folder, run `npm ci` and `npm test` to run the 19 checks against the neighboring `star-wars-app` source folder. The renderer emits a deprecation notice; the suite has no failing tests.

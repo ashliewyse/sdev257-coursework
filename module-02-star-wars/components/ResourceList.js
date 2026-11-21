@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  FlatList,
+  ScrollView,
+  Keyboard,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { colors } from '../theme';
+import SwipeableResourceRow from './SwipeableResourceRow';
+import ItemDialog from './ItemDialog';
 
 const BASE_URL = 'https://www.swapi.tech/api/';
 
@@ -46,6 +49,7 @@ export default function ResourceList({ resource }) {
   const [total, setTotal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
   const [request, setRequest] = useState({
     url: `${BASE_URL}${resource}`,
     append: false,
@@ -105,32 +109,30 @@ export default function ResourceList({ resource }) {
     if (!loading && nextUrl) setRequest({ url: nextUrl, append: true });
   }
 
+  function showItem(item) {
+    Keyboard.dismiss();
+    setSelectedItem(item);
+  }
+
   return (
-    <FlatList
+    <>
+    <ScrollView
       style={styles.list}
       contentContainerStyle={styles.listContent}
-      data={items}
-      keyExtractor={(item) => item.id}
-      ListHeaderComponent={
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag">
         <Text style={styles.summary} accessibilityLiveRegion="polite">
           {loading && items.length === 0
             ? 'Loading from SWAPI...'
             : total === null ? 'Live data from SWAPI' : `${items.length} of ${total} loaded`}
         </Text>
-      }
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Text style={styles.name}>{item.name}</Text>
-          {item.episode != null && (
-            <Text style={styles.detail}>Episode {item.episode} · {item.releaseDate}</Text>
-          )}
-          {item.director && <Text style={styles.detail}>Directed by {item.director}</Text>}
-        </View>
-      )}
-      ListEmptyComponent={!loading && !error ? (
+        {items.length > 0 && <Text style={styles.hint}>Swipe left or right, or tap an item to view details.</Text>}
+        {items.map((item) => (
+          <SwipeableResourceRow key={item.id} item={item} onSelect={showItem} />
+        ))}
+      {items.length === 0 && !loading && !error ? (
         <Text style={styles.message}>No items were returned.</Text>
       ) : null}
-      ListFooterComponent={
         <View style={styles.footer}>
           {loading && <ActivityIndicator color={colors.accent} accessibilityLabel="Loading list" />}
           {!!error && <Text style={styles.error} accessibilityRole="alert">{error}</Text>}
@@ -147,8 +149,9 @@ export default function ResourceList({ resource }) {
             <Text style={styles.message}>All items loaded</Text>
           )}
         </View>
-      }
-    />
+    </ScrollView>
+    <ItemDialog item={selectedItem} onClose={() => setSelectedItem(null)} />
+    </>
   );
 }
 
@@ -156,18 +159,7 @@ const styles = StyleSheet.create({
   list: { flex: 1 },
   listContent: { paddingHorizontal: 24, paddingBottom: 24 },
   summary: { color: colors.muted, fontSize: 13, marginTop: 8, marginBottom: 20 },
-  card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
-    borderRadius: 10,
-    padding: 18,
-    marginBottom: 12,
-  },
-  name: { color: colors.text, fontSize: 17, fontWeight: '600', lineHeight: 24 },
-  detail: { color: colors.muted, fontSize: 13, marginTop: 6, lineHeight: 20 },
+  hint: { color: colors.muted, fontSize: 13, lineHeight: 20, marginBottom: 14 },
   footer: { paddingTop: 8, paddingBottom: 12, alignItems: 'center' },
   message: { color: colors.muted, fontSize: 14, lineHeight: 22 },
   error: { color: '#ffb4b4', fontSize: 14, lineHeight: 22, marginBottom: 12, textAlign: 'center' },
